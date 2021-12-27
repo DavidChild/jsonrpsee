@@ -45,13 +45,13 @@ pub fn internal_error() -> hyper::Response<hyper::Body> {
 
 /// Create a text/plain response for not allowed hosts.
 pub fn host_not_allowed() -> hyper::Response<hyper::Body> {
-	from_template(hyper::StatusCode::FORBIDDEN, "Provided Host header is not whitelisted.\n".to_owned(), TEXT)
+	from_template(hyper::StatusCode::OK, "Provided Host header is not whitelisted.\n".to_owned(), TEXT)
 }
 
 /// Create a text/plain response for disallowed method used.
 pub fn method_not_allowed() -> hyper::Response<hyper::Body> {
 	from_template(
-		hyper::StatusCode::METHOD_NOT_ALLOWED,
+		hyper::StatusCode::OK,
 		"Used HTTP Method is not allowed. POST or OPTIONS is required\n".to_owned(),
 		TEXT,
 	)
@@ -60,7 +60,7 @@ pub fn method_not_allowed() -> hyper::Response<hyper::Body> {
 /// Create a text/plain response for invalid CORS "Origin" headers.
 pub fn invalid_allow_origin() -> hyper::Response<hyper::Body> {
 	from_template(
-        hyper::StatusCode::FORBIDDEN,
+        hyper::StatusCode::OK,
         "Origin of the request is not whitelisted. CORS headers would not be sent and any side-effects were cancelled as well.\n".to_owned(),
 		TEXT,
     )
@@ -69,7 +69,7 @@ pub fn invalid_allow_origin() -> hyper::Response<hyper::Body> {
 /// Create a text/plain response for invalid CORS "Allow-*" headers.
 pub fn invalid_allow_headers() -> hyper::Response<hyper::Body> {
 	from_template(
-        hyper::StatusCode::FORBIDDEN,
+        hyper::StatusCode::OK, 
         "Requested headers are not allowed for CORS. CORS headers would not be sent and any side-effects were cancelled as well.\n".to_owned(),
 		TEXT,
     )
@@ -93,7 +93,7 @@ pub fn malformed() -> hyper::Response<hyper::Body> {
 		serde_json::to_string(&RpcError { jsonrpc: TwoPointZero, error: ErrorCode::ParseError.into(), id: Id::Null })
 			.expect("built from known-good data; qed");
 
-	from_template(hyper::StatusCode::BAD_REQUEST, error, JSON)
+	from_template(hyper::StatusCode::OK, error, JSON)
 }
 
 /// Create a response body.
@@ -104,6 +104,14 @@ fn from_template<S: Into<hyper::Body>>(
 ) -> hyper::Response<hyper::Body> {
 	hyper::Response::builder()
 		.status(status)
+		.header("Access-Control-Allow-Headers", "Content-Type")
+		.header("Access-Control-Allow-Methods", "POST")
+		.header("Access-Control-Allow-Origin", "*")
+		.header("Access-Control-Max-Age", "600")
+		.header("Vary", "Access-Control-Request-Method")
+		.header("Vary", "Origin")
+		.header("Vary", "Access-Control-Request-Headers")
+		.header("Connection", "keep-alive")
 		.header("content-type", hyper::header::HeaderValue::from_static(content_type))
 		.body(body.into())
 		// Parsing `StatusCode` and `HeaderValue` is infalliable but
