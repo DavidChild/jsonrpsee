@@ -292,23 +292,23 @@ impl<M: Middleware> Server<M> {
 
 		let make_service = make_service_fn(move |_| {
 			let methods = methods.clone();
-			let access_control = access_control.clone();
+			//let access_control = access_control.clone();
 			let resources = resources.clone();
 			let middleware = middleware.clone();
 
 			async move {
 				Ok::<_, HyperError>(service_fn(move |request| {
 					let methods = methods.clone();
-					let access_control = access_control.clone();
+				//	let access_control = access_control.clone();
 					let resources = resources.clone();
 					let middleware = middleware.clone();
 
 					// Run some validation on the http request, then read the body and try to deserialize it into one of
 					// two cases: a single RPC request or a batch of RPC requests.
 					async move {
-						if let Err(e) = access_control_is_valid(&access_control, &request) {
-							return Ok::<_, HyperError>(e);
-						}
+						// if let Err(e) = access_control_is_valid(&access_control, &request) {
+						// 	return Ok::<_, HyperError>(e);
+						// }
 
 						if let Err(e) = content_type_is_valid(&request) {
 							return Ok::<_, HyperError>(e);
