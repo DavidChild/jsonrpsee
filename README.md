@@ -1,6 +1,6 @@
 [![GitLab Status](https://gitlab.parity.io/parity/jsonrpsee/badges/master/pipeline.svg)](https://gitlab.parity.io/parity/jsonrpsee/pipelines)
 
-# jsonrpsee
+# jsonrpsee    
 
 JSON-RPC library designed for async/await in Rust.
 
